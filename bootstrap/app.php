@@ -1,8 +1,10 @@
 <?php
 
 use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Configuration; 
-use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\CheckRole;
+use App\Http\Middleware\CheckActive;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -10,10 +12,15 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Illuminate\Foundation\Application $app) {
-        // custom middleware here
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->web(append: [
+            CheckActive::class,
+        ]);
+        $middleware->alias([
+            'role' => CheckRole::class,
+        ]);
     })
-    ->withExceptions(function (Illuminate\Foundation\Configuration\Exceptions $exceptions) {
-        // custom exception handling here
+    ->withExceptions(function (Exceptions $exceptions) {
+        //
     })
     ->create();
